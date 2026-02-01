@@ -1,7 +1,7 @@
 import amqp from "amqplib";
 
 let connection;
-let channel;
+let channel: any;
 
 const EXCHANGE_NAME = "MAIL_EXCHANGE";
 
@@ -19,21 +19,21 @@ async function connectRabbitMQ() {
   }
 }
 
-// async function publishEvent(routingKey, message) {
-//   try {
-//     if (!channel) {
-//       channel = await connectRabbitMQ();
-//     }
-//     channel.publish(
-//       EXCHANGE_NAME,
-//       routingKey,
-//       Buffer.from(JSON.stringify(message))
-//     );
-//     logger.info(`Event published to RabbitMQ: ${routingKey}`, message);
-//   } catch (error) {
-//     logger.error("Error publishing event to RabbitMQ", error);
-//   }
-// }
+export const publishEvent = async (routingKey: string, message: any) => {
+  try {
+    if (!channel) {
+      channel = await connectRabbitMQ();
+    }
+    channel.publish(
+      EXCHANGE_NAME,
+      routingKey,
+      Buffer.from(JSON.stringify(message))
+    );
+    // console.log(`Event published to RabbitMQ: ${routingKey}`, message);
+  } catch (error) {
+    console.error("Error publishing event to RabbitMQ", error);
+  }
+};
 
 // async function consumeEvent(routingKey, callback) {
 //   try {
