@@ -1,6 +1,9 @@
 import crypto from "crypto";
 import { publishEvent } from "../config/rabbitmq.config.js";
 import TryCatch from "../utils/tryCatchHandler.utils.js";
+import { User } from "../model/user.model.js";
+import { generateAccessToken } from "../helper/genToken.config.js";
+import type { AuthenticationRequest } from "../middleware/isAuth.middleware.js";
 
 export const loginUser = TryCatch(async (req, res) => {
   const { email } = req.body;
@@ -75,5 +78,26 @@ export const verifyOtp = TryCatch(async (req, res) => {
   await req.redisClient.del(`otp:${email}`);
   await req.redisClient.del(attemptsKey);
 
-  res.status(200).json({ message: "OTP verified successfully" });
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    const name = email.split("@")[0];
+    user = await User.create({ name, email });
+  }
+
+  const at = generateAccessToken(user);
+
+  const response = {
+    success: true,
+    message: "welcome to chartApp",
+    user,
+    at,
+  };
+
+  res.status(200).json({ data: response });
+});
+
+export const myProfile = TryCatch(async (req: AuthenticationRequest, res) => {
+  const user = req.user;
+  res.status(200).json({ data: user });
 });
