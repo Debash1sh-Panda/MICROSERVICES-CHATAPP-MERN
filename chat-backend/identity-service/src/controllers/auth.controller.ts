@@ -3,7 +3,6 @@ import { publishEvent } from "../config/rabbitmq.config.js";
 import TryCatch from "../utils/tryCatchHandler.utils.js";
 import { User } from "../model/user.model.js";
 import { generateAccessToken } from "../helper/genToken.config.js";
-import type { AuthenticationRequest } from "../middleware/isAuth.middleware.js";
 
 export const loginUser = TryCatch(async (req, res) => {
   const { email } = req.body;
@@ -95,9 +94,4 @@ export const verifyOtp = TryCatch(async (req, res) => {
   };
 
   res.status(200).json({ data: response });
-});
-
-export const myProfile = TryCatch(async (req: AuthenticationRequest, res) => {
-  const user = req.user;
-  res.status(200).json({ data: user });
 });
